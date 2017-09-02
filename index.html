@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>GAME</title>
+	<style>
+		body {
+			padding-top: 50px;
+			margin: 0 auto;
+			background: url(back.jpg);
+			background-size: cover;
+			height: 90%;
+		}
+		#screen {
+			padding-top: 100px;
+			width: 400px;
+			position: relative;
+			margin: 0 auto;
+		}
+		#ball {
+			background: url(giphy.gif)!important;
+			background-position: center!important;
+			background-size: 200%!important;			
+		}
+.btn {
+	position: absolute;
+	left: 50%;
+	top: 40%;
+	margin-top: -20px;
+	margin-left: -30px;
+  background: #3498db;
+  background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
+  background-image: -moz-linear-gradient(top, #3498db, #2980b9);
+  background-image: -ms-linear-gradient(top, #3498db, #2980b9);
+  background-image: -o-linear-gradient(top, #3498db, #2980b9);
+  background-image: linear-gradient(to bottom, #3498db, #2980b9);
+  -webkit-border-radius: 22;
+  -moz-border-radius: 22;
+  border-radius: 22px;
+  text-shadow: 5px 1px 8px #666666;
+  font-family: Georgia;
+  color: #ffffff;
+  font-size: 20px;
+  padding: 7px 20px 10px 20px;
+  border: solid #5b9bc2 1px;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: #3cb0fd;
+  background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+  background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
+  background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
+  background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+  background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+  text-decoration: none;
+}
+
+	</style>
+</head>
+<body id="gameScene">
+<div id="screen"></div>
+<script type="text/javascript">
+	
+obj = function(id) { return document.getElementById(id); } //Вызов любого объекта с ДОМа по айди
+
+//CREATING OBJECT GAME AND ITS METHODS
+game = {};
+game.Clear = function() { obj('screen').innerHTML = ''; } //CLEARING OBJECT GAME AFTER LOADING
+innerToOBJ = function(id, text) { document.getElementById(id).innerHTML = text } //WRITE TEXT TO OBJ
+
+game.Add = function(id, x, y, w, h, color, featProp) 
+	{ 
+		obj('screen').innerHTML += '<div id="'+id+'" style="position: absolute; left: '+x+'px; top: '+y+'px; width: '+w+'px ;height: '+h+'px; background: '+color+'; '+featProp+';"></div>'; 
+	}
+game.speed = 1;
+
+game.Pause = function(ms) { alert('pause'); }
+
+game.Init = function(fps) {
+	game.FPS = fps || 35;
+	obj('gameScene').onload = function() { keys.keyControl(); }
+	game.Clear();
+}
+ball = {};
+
+game.Restart = function() {
+	ball.speedX = defSpeed ;
+	ball.speedY = defSpeed ;
+}
+var defSpeed = 3;
+ball.speedX = defSpeed ;
+ball.speedY = defSpeed ;
+
+
+function keyboard(id) 
+{
+
+	if (keys.key == 37) { game.move(id, -game.speed, 0 ); }
+	
+	if (keys.key == 39) { game.move(id, game.speed, 0 ); }
+	
+	if (isCol('me', 'myObj1')) game.move(id, game.speed, 0);
+	if (isCol('me', 'myObj3')) game.move(id, -game.speed, 0);
+}
+
+function isCol(id1, id2) 
+{
+	var x1 = parseInt(obj(id1).style.left);
+	var x2 = parseInt(obj(id2).style.left);
+	var y1 = parseInt(obj(id1).style.top);
+	var y2 = parseInt(obj(id2).style.top);
+	var w1 = parseInt(obj(id1).style.width);
+	var w2 = parseInt(obj(id2).style.width);
+	var h1 = parseInt(obj(id1).style.height);
+	var h2 = parseInt(obj(id2).style.height);
+	return ( (  (y1 + h1 > y2 ) && ( x1 + w1 > x2 ) ) && ( ( x1 < x2 + w2 ) && ( y1 < y2 + h2 ) ) );
+}
+
+function checkSide(id1, id2) {
+	var x1 = parseInt(obj(id1).style.left);
+	var x2 = parseInt(obj(id2).style.left);
+	var y1 = parseInt(obj(id1).style.top);
+	var y2 = parseInt(obj(id2).style.top);
+	var w1 = parseInt(obj(id1).style.width);
+	var w2 = parseInt(obj(id2).style.width);
+	var h1 = parseInt(obj(id1).style.height);
+	var h2 = parseInt(obj(id2).style.height);
+	 return (((x1 + w1) <= x2 ) && (y1 > y2) && ((y1 + h2) < (y2 + h2))) || (((y1 > y2) && ((y1 + h2) < (y2 + h2)) && (x1 > x2 + w2)))
+}
+
+function setPos(id, x, y) {
+	o = obj(id);
+	x = parseInt(x);
+	y = parseInt(y);
+	o.style.left = x+'px';
+	o.style.top = y+'px';
+}
+
+function ricoshet(id1, id2) {
+	var x1 = parseInt(obj(id1).style.left);
+	var x2 = parseInt(obj(id2).style.left);
+	var w1 = parseInt(obj(id1).style.width);
+	var w2 = parseInt(obj(id2).style.width);
+	var c1 = w1/2;
+	var c2 = w2/2;
+
+	var dif = ((c2 + x2) - (c1 + x1));
+			ball.speedX = dif / 6;
+	
+	return true;
+}
+
+game.Engine = function() 
+{
+
+if (keys.key > 0) {
+	if (game.speed < 5) {
+		game.speed+=0.3
+	}
+}
+	
+if (keys.key == 0){ game.speed = 1 }
+		
+	keyboard('me');
+	
+	game.move('ball', ball.speedX, ball.speedY);
+	
+	if (isCol('me', 'ball')) {
+		ball.speedY = - ball.speedY;
+		ricoshet('me', 'ball');
+	}
+	
+	for ( var i = 1; i <=4; i++) {
+		if (isCol('ball', 'myObj'+i)) { 
+			if (i == 2) {
+				ball.speedY = - ball.speedY;
+			}
+			else if (i == 3 || i == 1) {
+				ball.speedX = - ball.speedX;
+			}
+			else if (i ==4) {
+				ball.speedX = ball.speedY = 0;
+				setPos('ball', 125, 250);
+
+				game.Restart();
+			}
+		}
+	}
+	for (var i = 1; i <= 10; i++) {
+		for (var j =1; j <= 5; j++) {
+			if (obj('block'+i+j) != null) {
+				if (isCol('block'+i+j, 'ball')) {
+					
+ if (checkSide('ball', 'block'+i+j)) {
+					ball.speedX = - ball.speedX;
+					} else {
+					ball.speedY = - ball.speedY;
+					}
+obj('block'+i+j).parentNode.removeChild(obj('block'+i+j));
+			       
+				}
+			}
+		}
+	}
+	
+}
+
+function waitForStart() {
+	setTimeout
+}
+
+game.move = function(id, x, y) {
+	o = obj(id);
+	x = parseInt(x);
+	y = parseInt(y);
+	o.style.left = parseInt(o.style.left)+x+'px';
+	o.style.top = parseInt(o.style.top)+y+'px';
+}
+//CREATING OBJECT KEYBOARD AND ITS METHODS	
+keys = {}; 
+keys.key = 0;
+
+obj('gameScene').onkeydown = function(event)
+{ 
+	keys.key = event.keyCode;
+}
+
+obj('gameScene').onkeyup = function() 
+{ 
+	keys.key = 0;
+}
+
+keys.keyControl = function() 
+{ 
+	waitForStart();
+	game.Engine(); 
+	//innerToOBJ('otlad', keys.key); 
+	innerToOBJ('otladi', obj('ball').style.left);
+	innerToOBJ('otlad', obj('me').style.left);
+	//innerToOBJ('otladi', game.speed);
+	setTimeout( keys.keyControl, game.FPS); 
+	
+}
+
+
+
+//GAME CODE
+game.Init(10);
+
+game.Add('me', 110, 580, 50, 5, '#fff');
+
+game.Add('ball', 125, 250, 15, 15, 'url(giphy.gif)', 'border-radius: 100%');
+
+game.Add('myObj1', 0, 0, 5, 600, '#999');
+game.Add('myObj2', 5, 0, 400, 5, '#999');
+game.Add('myObj3', 400, 5, 5, 600, '#999');
+game.Add('myObj4', 0, 600, 400, 5, '#999');
+
+for (var i = 1; i <= 10; i++) {
+	for (var j =1; j <= 5; j++) {
+		game.Add('block'+i+j, -34+i*40, j*17	, 33, 12, '#999');
+	}
+}
+
+//DEBUGGERS
+game.Add('otlad', 500, 300, 20, 20, 'red');
+game.Add('otladi', 600, 300, 50, 50, 'red');
+	
+</script>
+</body>
+</html>
